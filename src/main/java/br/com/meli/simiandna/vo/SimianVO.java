@@ -14,8 +14,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class SimianVO implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	private String[] dna;
-
+	
 }
