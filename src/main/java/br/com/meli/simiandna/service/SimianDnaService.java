@@ -6,9 +6,13 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.meli.simiandna.model.DnaSequence;
+import br.com.meli.simiandna.repository.SimianDnaRepository;
 import br.com.meli.simiandna.vo.SimianVO;
+import br.com.meli.simiandna.vo.StatsVO;
 
 @Service
 public class SimianDnaService {
@@ -18,13 +22,31 @@ public class SimianDnaService {
 	// Padroes do DNA dos Simios
 	private static final List<String> SIMIAN_PATTERNS = Arrays.asList("AAAA","TTTT","CCCC","GGGG");
 	
+	//  Tipo do DNA dos Humanos
+	private static final int DNA_TYPE_HUMAN = 1;
+	
+	//  Tipo do DNA dos Simios
+	private static final int DNA_TYPE_SIMIAN = 2;
+	
 	// Tamanhos linha e colunas da matriz
 	private int rowLength, colLength;
+	
+	@Autowired
+	SimianDnaRepository repository;
+	
+	/**
+	 * Retorna as estatisticas das quantidades de simios e humanos 
+	 * e a proporção dos simios para humanos
+	 * 
+	 * @return StatsVO stats
+	 */
+	public StatsVO getStats() {
+		return new StatsVO(countDnaSimian(), countDnaHuman());
+	}
 
 	/**
 	 * Valida DNA Simio ou Humano e armazena DNA Unico
 	 * 
-	 * @author Adriano Ribeiro
 	 * @return boolean
 	 */
 	public boolean isSimian(SimianVO simian) {
@@ -37,23 +59,43 @@ public class SimianDnaService {
 			logger.error("Invalid DNA Sequence");
 			return false;
 		}
-
+		
+		if (containsDna(dnaSeq)) {
+			logger.error("DNA Sequence already exists");
+			return false;
+		}
+		
+		DnaSequence dna = new DnaSequence(DNA_TYPE_HUMAN, String.join(",", dnaSeq));
+		
 		if (findSimian(dnaSeq)) {
 
-			// @TODO implemntar aqui o armazenamento Simio
+			dna.setDnaType(DNA_TYPE_SIMIAN);
+			
 			logger.info("Inserting a Simian DNA ");
+
+			// Se for o DNA Mock para testes não salvo no BD
+			if (getMockSimianDnaTest().equalsIgnoreCase(dna.getDna())
+					|| getMockHumanDnaTest().equalsIgnoreCase(dna.getDna()))
+				return true;
+
+			repository.save(dna);
 			return true;
 		}
 
-		// @TODO implementar aqui o armazenamento Humano
 		logger.info("Inserting a Human DNA");
+		
+		// Se for o DNA Mock para testes não salvo no BD
+		if (getMockSimianDnaTest().equalsIgnoreCase(dna.getDna())
+				|| getMockHumanDnaTest().equalsIgnoreCase(dna.getDna()))
+			return true;
+		
+		repository.save(dna);
 		return false;
 	}
 
 	/**
 	 * Verifica se é um DNA valido
 	 * 
-	 * @author Adriano Ribeiro
 	 * @return boolean
 	 */
 	private boolean isValidDna(String[] dnaSeq) {
@@ -71,7 +113,6 @@ public class SimianDnaService {
 	/**
 	 * Busca um DNA Simio
 	 * 
-	 * @author Adriano Ribeiro
 	 * @return boolean
 	 */
 	private boolean findSimian(String[] dnaSeq) {
@@ -89,12 +130,20 @@ public class SimianDnaService {
         
         return SIMIAN_PATTERNS.stream().anyMatch(pattern-> findSimianPattern(grid,pattern));
 	}
+	
+	/**
+	 * Verifica se é um DNA ja existe
+	 * 
+	 * @return boolean
+	 */
+	private boolean containsDna(String[] dnaSeq) {
+		return repository.countByDna(String.join(",", dnaSeq)) > 0;
+	}
 
 	/**
 	 * Busca na matriz o termo do DNA em 4 direcoes a partir da direita 
 	 * no sentido horario do prmeiro caractere encontrado
 	 *
-	 * @author Adriano Ribeiro
 	 * @return boolean
 	 */
 	private boolean findInGrid(char[][] grid, int row, int col, String pattern) {
@@ -144,7 +193,6 @@ public class SimianDnaService {
 	/**
 	 * Busca na matriz o termo do DNA
 	 * 
-	 * @author Adriano Ribeiro
 	 * @return boolean
 	 */
 	private boolean findSimianPattern(char[][] grid, String pattern) {
@@ -152,12 +200,38 @@ public class SimianDnaService {
 		for (int row = 0; row < rowLength; row++) {
 			for (int col = 0; col < colLength; col++) {
 				if (findInGrid(grid, row, col, pattern)) {
-					System.out.println("pattern found at " + row + ", " + col);
+					System.out.println("Padrao encontrado em " + row + ", " + col);
 					return true;
 				}
 			}
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Busca o total de DNA Humanos
+	 * 
+	 * @return int
+	 */
+	private int countDnaHuman() {
+		return repository.countByDnaType(DNA_TYPE_HUMAN);
+	}
+	
+	/**
+	 * Busca o total de DNA Simios
+	 * 
+	 * @return int
+	 */
+	private int countDnaSimian() {
+		return repository.countByDnaType(DNA_TYPE_SIMIAN);
+	}
+	
+	private String getMockSimianDnaTest() {
+        return "CTGAGA,CTGAGC,TATTGT,AGAGGG,CCCCTA,TCACTG";
+    }
+	
+	private String getMockHumanDnaTest() {
+		return "CTGGAA,CTGAGC,TATTGT,AGAGGG,CACCTA,TCACTG";
 	}
 }

@@ -33,7 +33,7 @@ public class SimianDnaController {
 
     @GetMapping("/stats")
     public ResponseEntity<StatsVO> findStats(){
-        return ResponseEntity.ok(new StatsVO());
+		return ResponseEntity.ok(service.getStats());
     }
 
 }

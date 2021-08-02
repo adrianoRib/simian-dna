@@ -2,14 +2,28 @@
 
 Projeto para expor serviços necessários para detectar se uma sequência de DNA pertence a um humano ou a um símio.
 
+## Documentação da API:
+
+- Swagger: http://simian-dna-app.rj.r.appspot.com/swagger-ui.html
+
+## Tecnologias
+
+- Java 11
+- Maven
+- Spring Boot
+- Spring Data JPA
+- Spring Web
+- Spring Test
+- MySql
+- Swagger
+- Lombok
+- Log4j
 
 ## Buscar estatísticas de verificações de DNA:
 
 ### Request
 
-Exemplo: http://localhost:8080/api-dna/v1/stats/
-
-`GET /api-dna/v1/stats/`
+`GET https://simian-dna-app.rj.r.appspot.com/api-dna/v1/stats/`
 
 ### Response
 
@@ -26,19 +40,17 @@ Exemplo: http://localhost:8080/api-dna/v1/stats/
 
 ### Request
 
-Exemplo: http://localhost:8080/api-dna/v1/simian/
-
-`POST /api-dna/v1/simian/`
-
-Exemplo CURL:
-
-    curl -X POST "http://localhost:8080/api-dna/v1/simian" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"dna\": [\"ATGCGA\", \"CAGTGC\", \"TTATGT\", \"AGAAGG\", \"CCCCTA\", \"TCACTG\"]}"
+`POST https://simian-dna-app.rj.r.appspot.com/api-dna/v1/simian/`
 
 Exemplo Request body:
 
     {
       "dna": ["ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"]
     }
+
+Exemplo CURL:
+
+    curl -X POST "https://simian-dna-app.rj.r.appspot.com/api-dna/v1/simian" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"dna\": [\"ATGCGA\", \"CAGTGC\", \"TTATGT\", \"AGAAGG\", \"CCCCTA\", \"TCACTG\"]}"
 
 ### Response
 

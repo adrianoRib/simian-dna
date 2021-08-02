@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:mysql://35.199.80.97:3306/simian_dna_db?useTimezone=true&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# Set the port to the PORT environment variable
+server:
+  port: ${PORT:8080}
