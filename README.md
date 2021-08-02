@@ -19,6 +19,15 @@ Projeto para expor serviços necessários para detectar se uma sequência de DNA
 - Lombok
 - Log4j
 
+## Iniciando o sistema local
+#### Eclipse
+
+- Botão direito na classe `SimianDnaApplication.java` e selecionar a opção `Run as > Java Application`
+
+#### Maven
+
+- Abrir o prompt de comando(terminal) na pasta raiz do projeto e digitar `mvnw spring-boot:run`
+
 ## Buscar estatísticas de verificações de DNA:
 
 ### Request
